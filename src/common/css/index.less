@@ -1,0 +1,89 @@
+// 屏幕划分份数
+@size: 40;
+// 设计稿大小
+@DesignSize: 750;
+
+/*
+
+    在 750px 的屏幕下 
+        1vw = 750px / 100vw => 7.5px;
+        1rem = (屏幕尺寸 / 100vw) * html字体大小 单位：px
+        1vw = 7.5px
+        0.133333333333vw = 1px
+
+*/
+
+html {
+    font-size: (100vw / @DesignSize)*@size;
+}
+
+@media screen and (min-width:750px) {
+    html {
+        font-size: 40px
+    }
+}
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    // -webkit-overflow-scrolling: touch;
+}
+
+html,
+body,
+#app {
+    height: 100%;
+    overflow: hidden;
+}
+
+
+body {
+    max-width: @DesignSize + 0px;
+    margin: 0 auto;
+    font-size: 16px;
+    font-family: '微软雅黑';
+    // padding: 0 5px;
+    background-color: #ffffff;
+    // -webkit-tap-highlight-color: transparent;
+}
+
+
+.article-content center{
+    max-height: 230px;
+}
+
+.article-content img{
+    margin: 4px 0;
+    max-height: 230px;
+    object-fit: contain;
+    border-radius: 4px;
+    // overflow: hidden;
+}
+
+.article-content a{
+    color: #52c0e8;
+}
+
+.article-content a:visited{
+    color: #52c0e8;
+}
+
+.article-images{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.article-images .gourd-image{
+    display: flex;
+    width: (100% / 3);
+    height: 250rem / @size;
+    margin: 0;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.article-images .gourd-image .gourd-image--img{
+    flex: 1;
+}
