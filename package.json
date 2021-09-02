@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --report"
   },
+  "description":"一款基于Vue核心语法，VueRouter，Vuex，实现的一个简约版葫芦侠Web程序。",
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",

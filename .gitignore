@@ -24,3 +24,5 @@ pnpm-debug.log*
 *.sw?
 
 problem.txt
+
+gourd-ui

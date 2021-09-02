@@ -2,6 +2,10 @@ import Vue from 'vue';
 
 import gourd from '../../gourd-ui/src/index';
 
+import '../../gourd-ui/css/index.less';
+
+import '../../gourd-ui/assets/icon/iconfont.css';
+
 const { Button, Badge, CellGroup, Cell, Tabbar, TabbarItem, Swipe, SwipeItem, NavBar, Image, ImageGroup, Tabs, Tab, Tag,Title,PullRefresh} = gourd;
 
 Vue.use(gourd);

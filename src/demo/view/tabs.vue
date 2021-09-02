@@ -8,7 +8,7 @@
       </gourd-tab>
     </gourd-tabs> -->
 
-    <gourd-tabs>
+    <gourd-tabs ceiling>
       <gourd-tab title="哈哈">
         <span slot="title">全部</span>
         <!-- <gourd-title v-for="(item,index) in 10" :key="index" title="我是一名web前端工程师免费 无广告 无需注册登录 功能强大 星际阅读" describe="我轻轻的走了，正如我轻轻的来，挥手一拍，不带走一片云彩！" :covers="arr" author="孤独" see="98878" info="89553" time="10分钟前">
@@ -26,6 +26,11 @@
       </gourd-tab>
 
       <gourd-tab title="原创开发">
+        <div>开发</div>
+      </gourd-tab>
+
+	  <gourd-tab>
+		  <span slot="title">全部</span>
         <div>开发</div>
       </gourd-tab>
 

@@ -6,7 +6,6 @@
       <gourd-image width="50" height="50" round text="6" src="666"></gourd-image>
       <gourd-image width="50" height="50" round text="20" src="666"></gourd-image>
       <gourd-image width="50" height="50" round text="50" src="666"></gourd-image>
-
     </groud-image-group>
 
     <h2 @click="ck">动态添加</h2>

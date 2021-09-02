@@ -4,14 +4,14 @@
     <gourd-nav-bar fixed ref="nav">
       <template slot="left">
         <img src="../../assets/post/ic_nav_back.png" alt="">
-        <button id="sort-btn" @click="isShow = !isShow" @blur="blur">按回复时间</button>
+        <button id="sort-btn" @click="isShow = !isShow" @blur="blur">{{showSortText}}</button>
       </template>
       <img src="../../assets/navbar/ic_message.png" slot="right" alt="">
     </gourd-nav-bar>
     <div class="sort line-bottom" v-show="isShow">
-      <button :class="post.sort_by === 0 ? 'active':''" @click.stop.prevent="sortFun(0)">回复时间</button>
-      <button :class="post.sort_by === 1 ? 'active':''" @click.stop.prevent="sortFun(1)">发布时间</button>
-      <button :class="post.sort_by === 2 ? 'active':''" @click.stop.prevent="sortFun(2)">版本精华</button>
+      <button :class="post.sort_by === 0 ? 'active':''" @click.stop.prevent="sortFun(0,'按回复时间')">按回复时间</button>
+      <button :class="post.sort_by === 1 ? 'active':''" @click.stop.prevent="sortFun(1,'按发布时间')">按发布时间</button>
+      <button :class="post.sort_by === 2 ? 'active':''" @click.stop.prevent="sortFun(2,'按版本精华')">按版本精华</button>
     </div>
 
     <div class="info">
@@ -114,6 +114,7 @@ export default {
 	data() {
 		return {
 			timer: '',
+			showSortText:'按回复时间',
 			overlayMask: true,
 			test: false,
 			scroll: true,
@@ -158,9 +159,10 @@ export default {
 				this.scrollTop = e.target.scrollTop;
 			}, 15);
 		},
-		async sortFun(sort) {
+		async sortFun(sort,sortText) {
 			// sort_by(排序) 0 => 按回复时间 1 => 按发布时间 2 => 按版本精华
 			this.post.sort_by = sort;
+			this.showSortText = sortText;
 
 			var currentTag = this.tags[this.active];
 
@@ -280,7 +282,7 @@ export default {
 			this.tags = category.tags;
 
 			this.$nextTick(() => {
-				this.$refs.tabs.tabContentEnd();
+				this.$refs.tabs.tabContentChange();
 			});
 			console.log(this.tags);
 		},
@@ -410,6 +412,7 @@ export default {
 	margin-left: 10px;
 	color: #fff;
 	font-size: 18px;
+	outline: none;
 	border: none;
 	background-color: transparent;
 }

@@ -1,11 +1,5 @@
 import Vue from 'vue'
 
-
-// icon
-import './assets/image/iconfont.css';
-import './assets/test/iconfont.css';
-
-
 import App from './App.vue';
 
 import router from './router';
@@ -28,11 +22,13 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './plugins/gourd';
 
 import axios from './plugins/axios';
-axios.defaults.baseURL = 'http://192.168.1.4:3000';
+axios.defaults.baseURL = 'http://192.168.1.2:3000';
 
 import './plugins/vant';
 
 import store from './store/index';
+store.dispatch('getUserStatus');
+
 
 // 全局过滤器
 import './common/js/filters';

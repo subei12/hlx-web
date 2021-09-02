@@ -2,7 +2,7 @@ import Vue from 'vue';
 
 import Vuex from 'vuex';
 
-import axios from 'axios';
+import axios from '../plugins/axios';
 
 Vue.use(Vuex);
 
@@ -81,7 +81,5 @@ var store = new Vuex.Store({
     }
 
 });
-
-store.dispatch('getUserStatus')
 
 export default store;

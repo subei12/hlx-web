@@ -4,12 +4,12 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    outputDir: path.join(__dirname, '../../gourd/public'),
+    outputDir: path.join(__dirname, '../../gourd/demo-gourd/public'),
     configureWebpack: (config) => {
         if (process.env.NODE_ENV === 'production') {
             config.entry = {
                 index: path.join(__dirname, 'src', 'main-production.js'),
-                'gourd-ui': path.join(__dirname, './gourd-ui/src/index.js')
+                'gourd-ui': path.join(__dirname, './gourd-ui/build/build.js')
             }
 
             config.output.filename = '[name].js';
