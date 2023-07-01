@@ -1,0 +1,3 @@
+[submodule "gourd-ui"]
+	path = gourd-ui
+	url = https://github.com/purpleru/gourd-ui.git
