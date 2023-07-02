@@ -74,7 +74,7 @@
           <span slot="title">{{item.name}}</span>
 
           <gourd-pull-refresh v-model="item.refresh" disabled>
-            <gourd-list v-model="item.listLoading" ref="lists" :height="tabHeight" :disable-scroll="scroll" @load="listLoad(item,tagIndex)">
+            <gourd-list v-model="item.listLoading" ref="lists" :height="tabHeight" :disable-scroll="false" @load="listLoad(item,tagIndex)">
               <gourd-title v-for="postItem in item.posts" :key="postItem.postID" @click="titleClick(postItem)" :describe="postItem.detail" :title="postItem.title" :covers="postItem.detail | parseImg(postItem.images)" :author="postItem.user.nick" :see="postItem.hit" :info="postItem.commentCount" :time="postItem.createTime | formatTime">
                 <template slot="title-prefix">
                   <!-- 葫芦数 -->
