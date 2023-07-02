@@ -115,7 +115,7 @@ export default {
 				return;
 			}
 
-			const { msg, currPageNo, pageSize, totalPage, comments } = await this.http.get('/post/detail', {
+			const { msg, currPageNo, pageSize, totalPage, comments } = await this.http.get('/post/detail/ANDROID/4.2.2', {
 				params: this.sendParams
 			});
 
@@ -133,7 +133,7 @@ export default {
 		},
 		// 初始化数据
 		async getArticleInfo() {
-			const { msg, comments, post, totalPage, currPageNo, pageSize } = await this.http.get('/post/detail', {
+			const { msg, comments, post, totalPage, currPageNo, pageSize } = await this.http.get('/post/detail/ANDROID/4.2.2', {
 				params: {
 					post_id: this.postID,
 					page_no: 1,

@@ -57,7 +57,22 @@ export default {
 
 			this.disabled = true;
 
-			const { code, msg, status, user, _key } = await this.http.post('/account/login', `account=${account}&password=${password}`);
+			//const { code, msg, status, user, _key } = await this.http.post(`/account/login/ANDROID/4.1.8?device_code=[d]f63ffbcf-5b3c-480a-a83a-d1e59bc907fa&account=${account}&login_type=2&password=${password}&sign=722EA12CD9CE46762C3F49589A13B5E3`);
+
+      const data = {
+        voice_code: '',
+        account: account,
+        login_type: 2, //密码登录
+        password: this.$md5(password)
+      }
+
+      const signParam = {
+        voice_code: '',
+        account: account,
+        password: this.$md5(password)
+      }
+
+      const { code, msg, status, user, _key } = await this.http.postForm('/account/login/ANDROID/4.1.8', data, signParam);
 
 			if (msg === '' && status === 1) {
                 this.$store.commit('setUser', { user, _key });

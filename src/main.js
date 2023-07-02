@@ -21,8 +21,11 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 import './plugins/gourd';
 
+import md5 from './plugins/md5';
+Vue.use(md5);
+
 import axios from './plugins/axios';
-axios.defaults.baseURL = 'http://192.168.1.2:3000';
+axios.defaults.baseURL = 'http://localhost:8000/api/';
 
 import './plugins/vant';
 

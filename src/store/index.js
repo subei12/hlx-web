@@ -53,7 +53,7 @@ var store = new Vuex.Store({
             try {
                 var { user, _key } = JSON.parse(window.localStorage.getItem('user') || '{}');
                 if (!user || !_key) return;
-                var result = await axios.get('/user/info', {
+                var result = await axios.get('/user/info/ANDROID/4.1.8', {
                     params: {
                         user_id: user.userID,
                         _key: _key

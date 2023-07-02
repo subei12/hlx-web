@@ -6,7 +6,8 @@ import router from './router';
 
 Vue.config.productionTip = false;
 
-import './plugins/axios';
+import axios from './plugins/axios';
+axios.defaults.baseURL = 'http://localhost:8000/api/';
 
 import store from './store/index';
 store.dispatch('getUserStatus');
@@ -15,6 +16,9 @@ store.dispatch('getUserStatus');
 import './common/js/filters';
 
 import './common/css/index.less';
+
+import md5 from 'js-md5';
+Vue.prototype.$md5 = md5;
 
 // 公共
 Vue.prototype.$bus = new Vue({});

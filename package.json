@@ -6,11 +6,13 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --report"
   },
-  "description":"一款基于Vue核心语法，VueRouter，Vuex，实现的一个简约版葫芦侠Web程序。",
+  "description": "一款基于Vue核心语法，VueRouter，Vuex，实现的一个简约版葫芦侠Web程序。",
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.2",
+    "js-md5": "^0.7.3",
+    "qs": "^6.7.0",
     "vant": "^2.12.25",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",

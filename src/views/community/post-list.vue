@@ -287,13 +287,14 @@ export default {
 			console.log(this.tags);
 		},
 		async getData(params = { start: 0, ID: 0 }) {
-			return await this.http.get('/post/list', {
+			return await this.http.get('/post/list/ANDROID/4.1.8', {
 				params: {
 					cat_id: this.$route.params.categoryID,
 					count: 20,
 					tag_id: params.ID,
 					sort_by: this.post.sort_by,
-					start: params.start
+					start: params.start,
+          market_id: 'floor_web'
 				}
 			});
 

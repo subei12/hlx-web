@@ -71,7 +71,7 @@ export default {
 			}, 15);
 		},
 		async getSlideLists() {
-			var result = await this.http.get('/post/slide');
+			var result = await this.http.get('/post/slide/ANDROID/4.1');
 
 			if (result.msg) {
 				return console.log('获取轮播图数据失败');
@@ -86,7 +86,7 @@ export default {
 				if (this.categoryLists) return;
 			} catch (err) {}
 
-			var { categories, msg } = await this.http.get('/category/list');
+			var { categories, msg } = await this.http.get('/category/list/ANDROID/2.0');
 
 			if (msg) {
 				console.log('获取社区列表失败');
