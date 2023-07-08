@@ -19,6 +19,9 @@ Vue.config.productionTip = false;
 import Element from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
+// 全局函数
+import './base/baseFun';
+
 import './plugins/gourd';
 
 import md5 from './plugins/md5';

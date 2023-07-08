@@ -3,7 +3,7 @@
   <div class="container" ref="container" @scroll="containerScroll">
     <gourd-nav-bar fixed ref="nav">
       <template slot="left">
-        <img src="../../assets/post/ic_nav_back.png" alt="">
+        <img src="../../assets/post/ic_nav_back.png" @click="$globalFunctions.goBack($router)" alt="">
         <button id="sort-btn" @click="isShow = !isShow" @blur="blur">{{showSortText}}</button>
       </template>
       <img src="../../assets/navbar/ic_message.png" slot="right" alt="">

@@ -1,7 +1,10 @@
 <template>
   <div class="container">
-    <gourd-nav-bar left-icon="el-icon-arrow-left" fixed>
-      <span slot="left">{{category.title}}</span>
+    <gourd-nav-bar @click-left="$globalFunctions.goBack($router)" fixed>
+      <template slot="left">
+        <img src="../../assets/post/ic_nav_back.png"  alt="">
+        <span>{{category.title}}</span>
+      </template>
       <img src="../../assets/navbar/ic_message.png" slot="right" alt="">
     </gourd-nav-bar>
 
