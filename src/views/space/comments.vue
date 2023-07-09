@@ -1,43 +1,12 @@
 <template>
   <div class="container">
-    <gourd-nav-bar @click-left="$globalFunctions.goBack($router)" fixed>
-      <template slot="left">
-        <img src="../../assets/post/ic_nav_back.png"  alt="">
-        <span>{{category.title}}</span>
-      </template>
+    <gourd-nav-bar title="葫芦侠社区" fixed>
+      <img src="../../assets/navbar/ic_class_add.png" slot="left" alt="">
       <img src="../../assets/navbar/ic_message.png" slot="right" alt="">
     </gourd-nav-bar>
 
     <gourd-pull-refresh class="public" v-model="refresh" @refresh="getArticleInfo" success-text="刷新成功" :disabled="refreshDisabled">
       <gourd-list v-model="loading" @load="loadComment" :finished="finished" finished-text="我是有底线的">
-        <!-- 文章标题 -->
-        <gourd-title :title="post.title" :author="user.nick" :see="post.hit" :info="post.commentCount">
-        </gourd-title>
-
-        <article class="article">
-          <!-- 作者 -->
-          <gourd-post-card class="author" :uname="user.nick" floor="楼主" :medal="user.medalList | medal" :avatar="user.avatar">
-            <template slot="tag">
-              <!-- 性别 -->
-              <gourd-tag type="primary" small><i class="iconfont icon-nan"></i>{{user.age}}</gourd-tag>
-              <!-- 版主 -->
-              <gourd-tag v-if="isModerator(user.userID)" color="#33b5e5" small>版主</gourd-tag>
-              <!-- 角色 -->
-              <gourd-tag v-if="user.identityTitle" :style="{ background: $globalFunctions.decimalToHexColor(user.identityColor) }" small>{{user.identityTitle}}</gourd-tag>
-            </template>
-          </gourd-post-card>
-
-          <!-- 文章内容 -->
-          <div class="article-content" v-html="handlerContent(post.detail||'')"></div>
-
-          <!-- 图片 -->
-          <div class="article-images">
-            <gourd-image v-for="(imgUrl,index) in post.images" :key="index" fit="cover" :src="imgUrl"></gourd-image>
-          </div>
-
-          <!-- <h2 v-for="i  in 50">{{i}}</h2> -->
-        </article>
-
         <!-- 评论 -->
         <div class="comment">
           <div class="comment-main">
@@ -45,7 +14,7 @@
               <span>评论<em class="comment-sum">{{post.commentCount}}</em></span>
             </div>
             <div>
-              <gourd-post-card v-for="(item,index) in comments" :key="item.commentID" :medal="item.user.medalList | medal" :uname="item.user.nick" :uname-color="item.user.nickColor" :call="item.user.userID | isLandlord(post.user)" :floor="index | floor" :time="item.createTime | formatTime" :avatar="item.user.avatar">
+              <gourd-post-card v-for="(item) in comments" :key="item.commentID" :medal="item.user.medalList | medal" :uname="item.user.nick" :uname-color="item.user.nickColor" :time="item.createTime | formatTime" :avatar="item.user.avatar">
                 <template slot="tag">
                   <!-- 性别 -->
                   <gourd-tag type="primary" small><i class="iconfont icon-nan"></i>{{item.user.age}}</gourd-tag>
@@ -66,21 +35,37 @@
                   <!-- 评论内容 -->
                   <div class="comment-post-card--row">{{item.text}}</div>
                 </div>
+                <template slot="post">
+                  <blockquote class="comment-post-card--ref" v-if="item.post">
+                    <div v-if="item.score">
+                      <em>送出: </em>
+                      <span :style="{ color: '#12c960' }">{{item.score}}</span>
+                      <span>葫芦</span>
+                    </div>
+                    <em>原帖: </em>
+                    <span>{{item.post.title}}</span>
+                    <br/>
+                    <em>版块: </em>
+                    <span>{{item.category.title}}</span>
+                    <!-- <div class="comment-post-card--row">{{item.post.title}}</div> -->
+                  </blockquote>
+                </template>
+                
               </gourd-post-card>
             </div>
           </div>
         </div>
       </gourd-list>
-
-    </gourd-pull-refresh>
-
-  </div>
+    </gourd-pull-refresh>  
+  </div>  
 </template>
 
 <script>
 import { handlerContent } from '../../common/js/article';
+import dialog from '../../demo/view/dialog.vue';
 
 export default {
+  components: { dialog },
 	name: 'Article',
 	props: ['postID'],
 	data() {
@@ -101,24 +86,24 @@ export default {
 			},
 			categoryID: '',
 			sendParams: {
-				post_id: this.$route.params.postID,
-				page_no: 1,
-				page_size: 20
+				user_id: 14057952,
+				start: 0,
+				count: 20
 			},
-			totalPage: ''
+			more: 0
 		};
 	},
 	methods: {
 		// 加载更多评论
 		async loadComment() {
       
-			if (this.sendParams.page_no >= this.totalPage) {
+			if (this.more == 0) {
 				this.finished = true;
 				this.loading = false;
 				return;
 			}
 
-			const { msg, currPageNo, pageSize, totalPage, comments } = await this.http.get('/post/detail/ANDROID/4.2.2', {
+			const { msg, start, more, comments } = await this.http.get('/comment/create/list/ANDROID/4.1.8', {
 				params: this.sendParams
 			});
 
@@ -127,40 +112,37 @@ export default {
 				return;
 			}
 
-			this.sendParams.page_no = currPageNo + 1;
-			this.sendParams.page_size = pageSize;
-			this.totalPage = totalPage;
+			this.sendParams.start = start;
+      // 为1表示还有评论待加载
+      this.more = more;
 
 			this.comments = this.comments.concat(comments);
 			this.loading = false;
 		},
 		// 初始化数据
 		async getArticleInfo() {
-			const { msg, comments, post, totalPage, currPageNo, pageSize } = await this.http.get('/post/detail/ANDROID/4.2.2', {
+      var { user } = JSON.parse(window.localStorage.getItem('user') || '{}');
+			const { msg, comments, post, start, more } = await this.http.get('/comment/create/list/ANDROID/4.1.8', {
 				params: {
-					post_id: this.postID,
-					page_no: 1,
-					page_size: 20
+					user_id: user.userID,
+					start: 0,
+					count: 20
 				}
 			});
 
 			if (msg) {
-				console.log('获取帖子信息失败');
+				console.log('获取我的评论失败');
 				return;
 			}
 
-			// 模块信息
-			this.category = post.category;
 
-			// 作者
-			this.user = post.user;
-
-			this.post = post;
+			// 评论
 			this.comments = comments;
-			this.totalPage = totalPage;
 
-			this.sendParams.page_no = currPageNo + 1;
-			this.sendParams.page_size = pageSize;
+      this.sendParams.user_id = user.userID;
+			this.sendParams.start = start;
+      // 为1表示还有评论待加载
+      this.more = more;
 
 			// 关闭下拉刷新
 			this.refresh = false;
@@ -178,12 +160,6 @@ export default {
 	filters: {
 		floor(val) {
 			return val + 1 + '楼';
-		},
-		isLandlord(val, landlordUser) {
-			if (val === landlordUser.userID) {
-				return '楼主';
-			}
-			return '';
 		},
 		identityColor(role) {
 			switch (role) {

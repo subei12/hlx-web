@@ -27,7 +27,7 @@
 
     <div class="space-cell">
       <gourd-cell-group>
-        <gourd-cell v-for="(item,index) in cells" :key="index" :title="item.title" link size="medium">
+        <gourd-cell v-for="(item,index) in cells" :key="index" :title="item.title" link :to="item.to" size="medium">
           <img :src="item.icon" slot="prefix" alt="">
           <span slot="suffix">{{item.value}}</span>
         </gourd-cell>
@@ -60,6 +60,7 @@ let messageCells = [
 		title: '我的回复',
 		icon: require('../../assets/space/cell/profile_comment.png'),
 		value: 0,
+    to: "/myComments",
 		attr: 'commentCount'
 	},
 	{

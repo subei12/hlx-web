@@ -6,6 +6,8 @@ Vue.use(VueRouter)
 
 import Main from './bin/main';
 
+import Space from './bin/space';
+
 import PostList from '../views/community/post-list.vue';
 
 import Article from '../views/community/article.vue';
@@ -41,7 +43,9 @@ const routes = [
   {
     path: '/login',
     component: Login
-  }
+  },
+  // 添加其他模块的路由配置
+  ...Space,
 ]
 
 const router = new VueRouter({
