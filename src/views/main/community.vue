@@ -1,6 +1,6 @@
 <template>
   <div class="community" ref="community" @scroll="communityScroll">
-    <gourd-nav-bar title="葫芦侠社区" fixed>
+    <gourd-nav-bar title="葫芦侠社区" @click-right="$router.push('/messages')" fixed>
       <img src="../../assets/navbar/ic_class_add.png" slot="left" alt="">
       <img src="../../assets/navbar/ic_message.png" slot="right" alt="">
     </gourd-nav-bar>

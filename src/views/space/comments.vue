@@ -1,7 +1,10 @@
 <template>
   <div class="container">
-    <gourd-nav-bar title="葫芦侠社区" fixed>
-      <img src="../../assets/navbar/ic_class_add.png" slot="left" alt="">
+    <gourd-nav-bar  @click-left="$globalFunctions.goBack($router)" fixed>
+      <template slot="left">
+        <img src="../../assets/post/ic_nav_back.png"  alt="">
+        <span>我的回复</span>
+      </template>
       <img src="../../assets/navbar/ic_message.png" slot="right" alt="">
     </gourd-nav-bar>
 
@@ -36,18 +39,20 @@
                   <div class="comment-post-card--row">{{item.text}}</div>
                 </div>
                 <template slot="post">
-                  <blockquote class="comment-post-card--ref" v-if="item.post">
-                    <div v-if="item.score">
+                  <blockquote class="comment-post-card--ref" v-if="item.content.post">
+                    <div v-if="item.content.score" :style="{ 'margin-bottom': '5px' }">
                       <em>送出: </em>
-                      <span :style="{ color: '#12c960' }">{{item.score}}</span>
+                      <span :style="{ color: '#12c960' }">{{item.content.score}}</span>
                       <span>葫芦</span>
                     </div>
-                    <em>原帖: </em>
-                    <span>{{item.post.title}}</span>
-                    <br/>
-                    <em>版块: </em>
-                    <span>{{item.category.title}}</span>
-                    <!-- <div class="comment-post-card--row">{{item.post.title}}</div> -->
+                    <div :style="{ 'margin-bottom': '5px' }">
+                      <em>原帖: </em>
+                      <span>{{item.content.post.title}}</span>
+                    </div>
+                    <div>
+                      <em>版块: </em>
+                      <span>{{item.content.category.title}}</span>
+                    </div>
                   </blockquote>
                 </template>
                 

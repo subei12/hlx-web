@@ -8,6 +8,8 @@ import Main from './bin/main';
 
 import Space from './bin/space';
 
+import Base from './bin/base';
+
 import PostList from '../views/community/post-list.vue';
 
 import Article from '../views/community/article.vue';
@@ -46,6 +48,7 @@ const routes = [
   },
   // 添加其他模块的路由配置
   ...Space,
+  ...Base,
 ]
 
 const router = new VueRouter({

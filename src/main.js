@@ -35,6 +35,8 @@ import './plugins/vant';
 import store from './store/index';
 store.dispatch('getUserStatus');
 
+// 全局api
+import './api/api';
 
 // 全局过滤器
 import './common/js/filters';
