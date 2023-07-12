@@ -4,7 +4,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    outputDir: path.join(__dirname, '../../gourd/demo-gourd/public'),
+    outputDir: path.join(__dirname, 'disc'),
     configureWebpack: (config) => {
         if (process.env.NODE_ENV === 'production') {
             config.entry = {
