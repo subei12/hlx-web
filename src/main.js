@@ -28,7 +28,7 @@ import md5 from './plugins/md5';
 Vue.use(md5);
 
 import axios from './plugins/axios';
-axios.defaults.baseURL = 'http://localhost:8000/api/';
+axios.defaults.baseURL = '/api/';
 
 import './plugins/vant';
 
