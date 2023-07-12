@@ -7,9 +7,9 @@
     <gourd-dialog v-model="show" class="dialog">
       <span slot="title">提示</span>
       <span>使用手机端打开可以获得更好的体验</span>
-      <div>
+      <!-- <div>
         <img src="./assets/demo-gourd.png" alt="">
-      </div>
+      </div> -->
       <template slot="footer">
         <gourd-button @click="show = false">确定</gourd-button>
       </template>

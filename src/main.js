@@ -28,7 +28,7 @@ import md5 from './plugins/md5';
 Vue.use(md5);
 
 import axios from './plugins/axios';
-axios.defaults.baseURL = '/api/';
+axios.defaults.baseURL = '/backend/';
 
 import './plugins/vant';
 
