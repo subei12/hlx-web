@@ -1,0 +1,19 @@
+{
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://floor.huluxia.com/$1",
+      "headers": {
+        "Referer": "",
+        "User-Agent": "okhttp/3.8.1"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    }
+  ]
+}
