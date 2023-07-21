@@ -151,6 +151,11 @@ export default {
     },
     // 提交回复 
     submit() {
+      // 如果没有文件，直接提交回复
+      const uploadComponent = this.$refs.upload;
+      if(uploadComponent.uploadFiles.length == 0){
+        this.sendMessage();
+      }
       // 手动上传
       this.$refs.upload.submit();
     },

@@ -11,6 +11,10 @@ module.exports = (req, res) => {
   if (req.url.startsWith('/backend')) {
     target = 'https://floor.huluxia.com/'
   }
+  // 上传图片的代理地址
+  if (req.url.startsWith('/backend/upload')) {
+    target = 'http://upload.huluxia.com/'
+  }
 
   // 创建代理对象并转发请求
   createProxyMiddleware({
