@@ -44,6 +44,7 @@ import './common/js/filters';
 import './common/css/index.less';
 
 Vue.use(Element);
+Vue.prototype.$message = Element.Message;
 
 
 // 公共

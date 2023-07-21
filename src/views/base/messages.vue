@@ -7,7 +7,14 @@
       </template>
     </gourd-nav-bar>
 
-
+    <ButtonsMenu :show = "show" :from = '1' :commentItem ="this.commentItem" @cancelClick="show = false" />
+    <!-- <gourd-button type="primary" @click="show = true">显示遮罩层</gourd-button>
+    <gourd-overlay  v-model="show" >
+      <div class="gourd-overlay--wrap">
+          <ButtonsMenu :show="true" :commentItem ="{'commentID':2}"  />
+      </div>
+    </gourd-overlay> -->
+    
     <gourd-tabs v-model="typeId" :distance="46" ref="tabs" @change="tabChange" >
         <gourd-tab v-for="(item) in tags" :key="item.ID" title="哈哈" :height="height">
           <span slot="title">{{item.name}}</span>
@@ -18,7 +25,7 @@
                 <div class="comment-main">
                   
                   <div>
-                    <gourd-post-card v-for="(item) in comments" :key="item.content.commentID" :medal="item.content.user.medalList | medal" :uname="item.content.user.nick" :uname-color="item.content.user.nickColor" :time="item.content.createTime | formatTime" :avatar="item.content.user.avatar">
+                    <gourd-post-card v-for="(item) in comments" :key="item.content.commentID" :medal="item.content.user.medalList | medal" :uname="item.content.user.nick" :uname-color="item.content.user.nickColor" :time="item.content.createTime | formatTime" :avatar="item.content.user.avatar" @click="openMenu(item)" @clickAvatar="clickAvatar">
                       <template slot="tag">
                         <!-- 性别 -->
                         <gourd-tag type="primary" small><i class="iconfont icon-nan"></i>{{item.content.user.age}}</gourd-tag>
@@ -39,7 +46,7 @@
                         <!-- 评论内容 -->
                         <div class="comment-post-card--row">{{item.content.text}}</div>
                       </div>
-                      <template slot="post">
+                      <template slot="bottom">
                         <blockquote class="comment-post-card--ref" v-if="item.content.post">
                           <div v-if="item.content.score" :style="{ 'margin-bottom': '5px' }">
                             <em>获得: </em>
@@ -72,10 +79,10 @@
 
 <script>
 import { handlerContent } from '../../common/js/article';
-import dialog from '../../demo/view/dialog.vue';
+import ButtonsMenu from '../../components/ButtonsMenu.vue';
 
 export default {
-  components: { dialog },
+  components: {  ButtonsMenu },
 	name: 'Article',
 	props: ['postID'],
 	data() {
@@ -112,7 +119,9 @@ export default {
         }
       ],
       typeId: 8,
-      height: 0
+      height: 0,
+      show: false,
+      commentItem: {},
 		};
 	},
 	methods: {
@@ -194,6 +203,15 @@ export default {
       this.height = containerHeight;
       //console.log('容器的高度:', containerHeight);
 
+    },
+    // 点击事件 - 菜单
+    openMenu(item){
+      this.show = true;
+      this.commentItem = item.content;
+      console.log(this.commentItem)
+    },
+    clickAvatar() {
+      console.log("我点击头像了一下");
     }
 	},
 	filters: {
@@ -287,4 +305,6 @@ export default {
 	margin-top: 10px;
 	color: #646464;
 }
+
+
 </style>

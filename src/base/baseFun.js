@@ -13,7 +13,6 @@ const globalFunctions = {
   decimalToHexColor(decimalColor) {
     var hex = decimalColor.toString(16);
     var hexColor = '#' + hex.slice(hex.length - 6);
-    console.log(hexColor);
     return hexColor;
   }
 

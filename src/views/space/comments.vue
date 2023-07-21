@@ -38,20 +38,20 @@
                   <!-- 评论内容 -->
                   <div class="comment-post-card--row">{{item.text}}</div>
                 </div>
-                <template slot="post">
-                  <blockquote class="comment-post-card--ref" v-if="item.content.post">
-                    <div v-if="item.content.score" :style="{ 'margin-bottom': '5px' }">
+                <template slot="bottom">
+                  <blockquote class="comment-post-card--ref" v-if="item.post">
+                    <div v-if="item.score" :style="{ 'margin-bottom': '5px' }">
                       <em>送出: </em>
-                      <span :style="{ color: '#12c960' }">{{item.content.score}}</span>
+                      <span :style="{ color: '#12c960' }">{{item.score}}</span>
                       <span>葫芦</span>
                     </div>
                     <div :style="{ 'margin-bottom': '5px' }">
                       <em>原帖: </em>
-                      <span>{{item.content.post.title}}</span>
+                      <span>{{item.post.title}}</span>
                     </div>
                     <div>
                       <em>版块: </em>
-                      <span>{{item.content.category.title}}</span>
+                      <span>{{item.category.title}}</span>
                     </div>
                   </blockquote>
                 </template>

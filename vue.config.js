@@ -43,12 +43,25 @@ module.exports = {
     devServer: {
       port: 8000,
       proxy: {
-        '/api': {
+        '/backend/upload': {
+          target: 'http://upload.huluxia.com', //API服务器的地址
+          //ws: true,  //代理websockets
+          changeOrigin: true, // 虚拟的站点需要更管origin
+          pathRewrite: {   //重写路径 比如'/api/aaa/ccc'重写为'/aaa/ccc'
+            '^/backend': '',
+          },
+          // onProxyReq(proxyReq) {
+          //   proxyReq.setHeader('Referer', '');
+          //   //proxyReq.setHeader('Host', 'floor.huluxia.com');
+          //   proxyReq.setHeader('User-Agent', 'okhttp/3.8.1');  
+          // },
+        },
+        '/backend': {
           target: 'https://floor.huluxia.com', //API服务器的地址
           //ws: true,  //代理websockets
           changeOrigin: true, // 虚拟的站点需要更管origin
           pathRewrite: {   //重写路径 比如'/api/aaa/ccc'重写为'/aaa/ccc'
-            '^/api': '',
+            '^/backend': '',
           },
           onProxyReq(proxyReq) {
             proxyReq.setHeader('Referer', '');
