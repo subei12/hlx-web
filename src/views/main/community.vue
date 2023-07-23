@@ -7,7 +7,7 @@
 
     <div class="swipe">
       <gourd-swipe>
-        <gourd-swipe-item :text="item.title" v-for="item in slideLists" :key="item.postId">
+        <gourd-swipe-item :text="item.title" v-for="item in slideLists" :key="item.postId" @click="goToArticle(item)">
           <img :src="item.coverUrl" alt="">
         </gourd-swipe-item>
       </gourd-swipe>
@@ -112,6 +112,15 @@ export default {
 			window.sessionStorage.setItem('categoryLists', JSON.stringify(arr));
 
 			this.categoryLists = arr;
+		},
+    goToArticle(postItem) {
+			// console.log(postItem);
+			this.$router.push({
+				name: 'article',
+				params: {
+					postID: postItem.jumpMode
+				}
+			});
 		}
 	},
 	mounted() {
