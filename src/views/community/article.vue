@@ -45,7 +45,8 @@
               <span>评论<em class="comment-sum">{{post.commentCount}}</em></span>
             </div>
             <div>
-              <gourd-post-card v-for="(item,index) in comments" :key="item.commentID" :medal="item.user.medalList | medal" :uname="item.user.nick" :uname-color="item.user.nickColor" :call="item.user.userID | isLandlord(post.user)" :floor="index | floor" :time="item.createTime | formatTime" :avatar="item.user.avatar">
+              <gourd-post-card v-for="(item) in comments" :key="item.commentID" :medal="item.user.medalList | medal" :uname="item.user.nick" :uname-color="item.user.nickColor" :call="item.user.userID | isLandlord(post.user)" :floor="item.seq | floor(item.seq)" :time="item.createTime | formatTime" :avatar="item.user.avatar">
+                <gourd-tag slot="floorTag" v-if="item.isTop == 1" color="#66A9D5">置顶</gourd-tag>
                 <template slot="tag">
                   <!-- 性别 -->
                   <gourd-tag type="primary" small><i class="iconfont icon-nan"></i>{{item.user.age}}</gourd-tag>
@@ -180,8 +181,8 @@ export default {
 		}
 	},
 	filters: {
-		floor(val) {
-			return val + 1 + '楼';
+		floor(seq) {
+			return seq + '楼';
 		},
 		isLandlord(val, landlordUser) {
 			if (val === landlordUser.userID) {
