@@ -112,11 +112,14 @@ export default {
 		// 加载更多评论
 		async loadComment() {
       
+      // 当前页小于总页数继续加载
 			if (this.sendParams.page_no >= this.totalPage) {
 				this.finished = true;
 				this.loading = false;
 				return;
 			}
+      // 当前页面加1获取下一页数据
+      this.sendParams.page_no = this.sendParams.page_no + 1;
 
 			const { msg, currPageNo, pageSize, totalPage, comments } = await this.http.get('/post/detail/ANDROID/4.2.2', {
 				params: this.sendParams
@@ -127,7 +130,7 @@ export default {
 				return;
 			}
 
-			this.sendParams.page_no = currPageNo + 1;
+			//this.sendParams.page_no = currPageNo + 1;
 			this.sendParams.page_size = pageSize;
 			this.totalPage = totalPage;
 
@@ -159,7 +162,8 @@ export default {
 			this.comments = comments;
 			this.totalPage = totalPage;
 
-			this.sendParams.page_no = currPageNo + 1;
+      // 初始化页面后 当前页应该为1（跳转页面初始化另算，暂时没有）
+			//this.sendParams.page_no = currPageNo;
 			this.sendParams.page_size = pageSize;
 
 			// 关闭下拉刷新
