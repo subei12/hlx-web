@@ -1,6 +1,6 @@
 <template>
   <div class="space">
-    <gourd-nav-bar>
+    <gourd-nav-bar @click-right="$router.push('/messages')">
       <img src="../../assets/navbar/ic_profile_setting.png" slot="left" alt="">
       <img src="../../assets/navbar/ic_message.png" slot="right" alt="">
     </gourd-nav-bar>
@@ -156,7 +156,7 @@ header {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
-	margin-top: 10px;
+	margin-top: 46px;
 	color: #fff;
 	transform: translateY(-40%);
 

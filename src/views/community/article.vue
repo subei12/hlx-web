@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <gourd-nav-bar @click-left="$globalFunctions.goBack($router)" fixed>
+    <gourd-nav-bar @click-left="$globalFunctions.goBack($router)" @click-right="$router.push('/messages')" fixed>
       <template slot="left">
         <img src="../../assets/post/ic_nav_back.png"  alt="">
         <span>{{category.title}}</span>

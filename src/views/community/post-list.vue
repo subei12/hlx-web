@@ -1,7 +1,7 @@
 <template>
 
   <div class="container" ref="container" @scroll="containerScroll">
-    <gourd-nav-bar fixed ref="nav">
+    <gourd-nav-bar fixed ref="nav" @click-right="$router.push('/messages')">
       <template slot="left">
         <img src="../../assets/post/ic_nav_back.png" @click="$globalFunctions.goBack($router)" alt="">
         <button id="sort-btn" @click="isShow = !isShow" @blur="blur">{{showSortText}}</button>
