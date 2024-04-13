@@ -21,7 +21,7 @@ module.exports = (req, res) => {
     target,
     changeOrigin: true,
     headers: {
-      'User-Agent': '', // 设置 User-Agent 为空
+      'User-Agent': 'okhttp/3.8.1',
       'Referer': '' // 设置 Referer 为空
     },
     pathRewrite: {

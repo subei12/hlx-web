@@ -88,7 +88,8 @@ function postWithSignImg(url, data = {}, signParam = {}, file = {},contentType =
   console.log(queryString);
   // 设置请求头
   const headers = {
-    "Content-Type": contentType == "form-data" ? 'multipart/form-data' : "application/json"
+    "Content-Type": contentType == "form-data" ? 'multipart/form-data' : "application/json",
+    "User-Agent": "okhttp/3.8.1"
   };
   const formData = new FormData();
   // 遍历data对象的键值对，并添加到FormData对象中

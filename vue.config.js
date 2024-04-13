@@ -50,11 +50,9 @@ module.exports = {
           pathRewrite: {   //重写路径 比如'/api/aaa/ccc'重写为'/aaa/ccc'
             '^/backend': '',
           },
-          // onProxyReq(proxyReq) {
-          //   proxyReq.setHeader('Referer', '');
-          //   //proxyReq.setHeader('Host', 'floor.huluxia.com');
-          //   proxyReq.setHeader('User-Agent', 'okhttp/3.8.1');  
-          // },
+          onProxyReq(proxyReq) {
+            proxyReq.setHeader('User-Agent', 'okhttp/3.8.1');  
+          },
         },
         '/backend': {
           target: 'https://floor.huluxia.com', //API服务器的地址
@@ -70,5 +68,7 @@ module.exports = {
           },
         }
       },
-    }
+    },
+    // 打包 app 配置
+    publicPath: "./"
 }

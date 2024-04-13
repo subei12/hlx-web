@@ -7,7 +7,9 @@ import router from './router';
 Vue.config.productionTip = false;
 
 import axios from './plugins/axios';
-axios.defaults.baseURL = 'http://localhost:8000/api/';
+//axios.defaults.baseURL = 'http://localhost:8000/api/';
+// 打包 app 配置
+axios.defaults.baseURL = 'https://f3.jsls9.top/backend/';
 
 import store from './store/index';
 store.dispatch('getUserStatus');
