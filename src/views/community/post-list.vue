@@ -128,6 +128,7 @@ export default {
 				sort_by: 0
 			},
 			active: 0,
+			prevActive: 0,
 			distance: {
 				navHeight: 0,
 				tabsTop: 0,
@@ -163,6 +164,11 @@ export default {
 			}
 			this.timer = setTimeout(() => {
 				this.scrollTop = e.target.scrollTop;
+				// 记录当前 tag 的滚动位置（用于切回时恢复）
+				const current = this.tags && this.tags[this.active];
+				if (current) {
+					current.scrollTop = this.scrollTop;
+				}
 				// Single-scroll mode: trigger load-more based on outer container scroll
 				this.maybeLoadMore();
 			}, 15);
@@ -223,24 +229,41 @@ export default {
 			}
 		},
 		tabChange(index) {
-			var item = this.tags[this.active];
+			// 保存旧 tab 的滚动位置
+			const oldIndex = this.prevActive;
+			const oldItem = this.tags && this.tags[oldIndex];
+			if (oldItem && this.el) {
+				oldItem.scrollTop = this.el.scrollTop;
+				oldItem._visited = true;
+			}
 
+			// 切换到新 tab
+			const item = this.tags && this.tags[index];
+			if (!item) return;
+
+			// 数据需要刷新/首次加载
 			if (item.posts.length === 0 || item.sort_by !== this.post.sort_by) {
 				item.sort_by = this.post.sort_by;
 				item.start = 0;
+				item.finished = false;
 
 				if (item.posts.length !== 0) {
 					item.refresh = true;
-					// single-scroll: outer container scrolls; no inner list scroll restore
-					this.el && this.el.scroll(0, 0);
 				}
 
-				item.finished = false;
 				this.setItemData(item, true);
 			}
 
-			// Keep previous behavior: when switching tabs, jump to bottom of header so list starts
-			this.el && this.el.scroll(0, this.el.scrollHeight - this.el.clientHeight);
+			// 滚动行为：
+			// - 第一次进入某个 tag：从该 tag 的第一条开始（让 tabs 顶在顶部，下一行就是第一条帖子）
+			// - 回到看过的 tag：恢复之前的滚动深度
+			const tabsTop = this.distance.tabsTop || 0;
+			const targetTop = item._visited ? (item.scrollTop ?? tabsTop) : tabsTop;
+			this.el && this.el.scroll(0, targetTop);
+			item._visited = true;
+			item.scrollTop = targetTop;
+
+			this.prevActive = index;
 		},
 		titleClick(postItem) {
 			// console.log(postItem);
@@ -310,6 +333,9 @@ export default {
 				item.refresh = false;
 				item.sort_by = this.post.sort_by;
 				item.finished = false;
+				// 记录每个 tag 自己的滚动位置（外层容器 scrollTop）
+				item.scrollTop = 0;
+				item._visited = index === 0;
 			});
 
 			this.category = category;
@@ -384,7 +410,10 @@ export default {
 		}
 	},
 	activated() {
-		this.$refs.container.scroll(0, this.scrollTop);
+		// 优先恢复当前 tag 的滚动深度
+		const current = this.tags && this.tags[this.active];
+		const top = current && typeof current.scrollTop === 'number' ? current.scrollTop : this.scrollTop;
+		this.$refs.container.scroll(0, top);
 	}
 };
 </script>
