@@ -128,7 +128,12 @@ export default {
 				sort_by: 0
 			},
 			active: 0,
+			// 记录上一次激活的 tab index（用于在 tabChange 时保存旧 tab 的 scrollTop）
 			prevActive: 0,
+			// tabs 从“未吸顶”滚到“吸顶”所需的阈值 scrollTop。
+			// 关键点：这个值必须是“固定阈值”，不能在 tabs 已经吸顶后用 rect 差值去算，
+			// 否则会变成“当前 scrollTop”，导致其它 tag 的位置被污染（切换后跳到很深处）。
+			tabsStickyTop: 0,
 			distance: {
 				navHeight: 0,
 				tabsTop: 0,
@@ -149,8 +154,12 @@ export default {
 
 		this.$nextTick(() => {
 			this.distance.navHeight = this.$refs.nav.$el.offsetHeight;
-			this.distance.tabsTop = this.$refs.tabs.offsetTop;
-			this.distance.wrapHeight = this.$refs.tabs.$refs.wrap.offsetHeight;
+			// tabs 是一个 Vue 组件，需要取 $el 才能拿到 offsetTop
+			this.distance.tabsTop = this.$refs.tabs && this.$refs.tabs.$el ? this.$refs.tabs.$el.offsetTop : 0;
+			this.distance.wrapHeight = this.$refs.tabs && this.$refs.tabs.$refs && this.$refs.tabs.$refs.wrap ? this.$refs.tabs.$refs.wrap.offsetHeight : 0;
+
+			// 初始化吸顶阈值（在页面刚进入、tabs 尚未吸顶时测一次）
+			this.updateTabsStickyTop();
 		});
 
 		this.$store.commit('setKeep', 'PostList');
@@ -168,10 +177,53 @@ export default {
 				const current = this.tags && this.tags[this.active];
 				if (current) {
 					current.scrollTop = this.scrollTop;
+					current._everActivated = true;
 				}
+				// 只要还能测到，就不断更新一次 tabsStickyTop（在未吸顶阶段有效）
+				this.updateTabsStickyTop();
 				// Single-scroll mode: trigger load-more based on outer container scroll
 				this.maybeLoadMore();
 			}, 15);
+		},
+		// 尝试更新 tabsStickyTop：只在 tabs 尚未吸顶时才更新。
+		// 一旦吸顶（wrapRect.top≈containerRect.top），继续更新会把阈值误写成“当前滚动位置”。
+		updateTabsStickyTop() {
+			const containerEl = this.el;
+			const wrapEl = this.$refs.tabs && this.$refs.tabs.$refs ? this.$refs.tabs.$refs.wrap : null;
+			if (!containerEl || !wrapEl || !wrapEl.getBoundingClientRect) return;
+
+			const containerRect = containerEl.getBoundingClientRect();
+			const wrapRect = wrapEl.getBoundingClientRect();
+
+			// 如果 wrap 还没吸顶（它的 top > container top），就可以用 rect 差值算出阈值
+			// 一旦吸顶后 wrapRect.top≈containerRect.top，再用差值会变成“当前 scrollTop”，会误算。
+			const delta = wrapRect.top - containerRect.top;
+			if (delta > 1) {
+				const stickyTop = Math.max(0, Math.round(containerEl.scrollTop + delta));
+				this.tabsStickyTop = stickyTop;
+			}
+		},
+		// 获取“让 tabs 进入吸顶状态”所需要滚动到的 container.scrollTop。
+		// - 未吸顶：用 rect 差值换算
+		// - 已吸顶：必须用缓存 tabsStickyTop（避免算成当前 scrollTop）
+		getTabsStickyTop() {
+			const containerEl = this.el;
+			const wrapEl = this.$refs.tabs && this.$refs.tabs.$refs ? this.$refs.tabs.$refs.wrap : null;
+			if (!containerEl || !wrapEl || !wrapEl.getBoundingClientRect) {
+				return this.tabsStickyTop || this.distance.tabsTop || 0;
+			}
+
+			const containerRect = containerEl.getBoundingClientRect();
+			const wrapRect = wrapEl.getBoundingClientRect();
+			const delta = wrapRect.top - containerRect.top;
+
+			// 如果当前已经吸顶（delta≈0），阈值应该用缓存的 tabsStickyTop，而不是当前 scrollTop
+			if (Math.abs(delta) <= 1 && this.tabsStickyTop) {
+				return this.tabsStickyTop;
+			}
+
+			// 未吸顶时，用差值换算阈值
+			return Math.max(0, Math.round(containerEl.scrollTop + delta));
 		},
 		maybeLoadMore() {
 			const current = this.tags && this.tags[this.active];
@@ -234,33 +286,58 @@ export default {
 			const oldItem = this.tags && this.tags[oldIndex];
 			if (oldItem && this.el) {
 				oldItem.scrollTop = this.el.scrollTop;
-				oldItem._visited = true;
+				oldItem._everActivated = true;
 			}
 
-			// 切换到新 tab
+			// 切换到新 tab（保险起见，这里手动同步 active，避免 v-model 时序差异）
+			this.active = index;
 			const item = this.tags && this.tags[index];
 			if (!item) return;
+
+			// 计算“让 tabs 吸顶”所需的 container.scrollTop。
+			// 注意：tabsTop 不能直接用 offsetTop（它是相对 offsetParent 的），
+			// 需要用 getBoundingClientRect 换算到滚动容器坐标系里。
+			const tabsTop = this.getTabsStickyTop();
+
+			// 切换 tag 时，强制让 tabs 进入吸顶状态。
+			// 解释：新 tag 刚切过去时，列表内容可能还没渲染完成，scrollHeight 不够，
+			// 这时滚到 tabsTop 会被浏览器“卡住”。因此我们先标记，
+			// 等 setItemData 把数据渲染出来后再补一次滚动。
+			item._forceStickyOnEnter = true;
 
 			// 数据需要刷新/首次加载
 			if (item.posts.length === 0 || item.sort_by !== this.post.sort_by) {
 				item.sort_by = this.post.sort_by;
 				item.start = 0;
 				item.finished = false;
-
-				if (item.posts.length !== 0) {
-					item.refresh = true;
-				}
-
 				this.setItemData(item, true);
 			}
 
 			// 滚动行为：
-			// - 第一次进入某个 tag：从该 tag 的第一条开始（让 tabs 顶在顶部，下一行就是第一条帖子）
-			// - 回到看过的 tag：恢复之前的滚动深度
-			const tabsTop = this.distance.tabsTop || 0;
-			const targetTop = item._visited ? (item.scrollTop ?? tabsTop) : tabsTop;
-			this.el && this.el.scroll(0, targetTop);
-			item._visited = true;
+			// - 第一次进入某个 tag：滚到 tabsTop（吸顶位置）
+			// - 回到已访问的 tag：恢复深度，但不得小于 tabsTop（保证切换后直接吸顶）
+			const isFirstEnter = !item._everActivated;
+			const savedTop = item.scrollTop ?? tabsTop;
+			const targetTop = isFirstEnter ? tabsTop : Math.max(tabsTop, savedTop);
+
+			const applyScroll = (top) => {
+				if (!this.el) return;
+				// 这里同时写 scrollTop + scroll/scrollTo，是为了兼容不同浏览器/内核在某些时序下忽略滚动的情况
+				this.el.scrollTop = top;
+				this.el.scroll(0, top);
+				this.el.scrollTo && this.el.scrollTo(0, top);
+			};
+
+			// 连续滚动多次：立即 / nextTick+rAF / 延迟兜底
+			// 目的：抵抗 tab 内容切换、图片加载、列表渲染带来的布局变化导致的“回弹/覆盖”
+			applyScroll(targetTop);
+			this.$nextTick(() => {
+				requestAnimationFrame(() => applyScroll(targetTop));
+				setTimeout(() => applyScroll(targetTop), 80);
+				setTimeout(() => applyScroll(targetTop), 220);
+			});
+
+			item._everActivated = true;
 			item.scrollTop = targetTop;
 
 			this.prevActive = index;
@@ -275,8 +352,6 @@ export default {
 			});
 		},
 		async setItemData(item, restore = false) {
-			// console.log(item);
-
 			var { msg, posts, start } = await this.getData(item);
 
 			if (msg) {
@@ -295,6 +370,20 @@ export default {
 				item.posts = posts;
 			} else {
 				item.posts = item.posts.concat(posts);
+			}
+
+			// 切换 tag 后“直接吸顶”的兜底：等数据渲染后再把 scrollTop 拉到 tabs 位置
+			if (item._forceStickyOnEnter && this.tags && item === this.tags[this.active]) {
+				item._forceStickyOnEnter = false;
+				this.$nextTick(() => {
+					requestAnimationFrame(() => {
+						const containerEl = this.el;
+						if (!containerEl) return;
+						const stickyTop = this.getTabsStickyTop();
+						containerEl.scrollTop = stickyTop;
+						containerEl.scroll(0, stickyTop);
+					});
+				});
 			}
 		},
 		async listLoad(item, index) {
@@ -335,7 +424,10 @@ export default {
 				item.finished = false;
 				// 记录每个 tag 自己的滚动位置（外层容器 scrollTop）
 				item.scrollTop = 0;
-				item._visited = index === 0;
+				// 标记该 tag 是否真正被用户切换访问过
+				// - false：首次进入该 tag，需要强制滚到 tabs 吸顶位置（不展示上面内容）
+				// - true：再次进入该 tag，恢复其 scrollTop（同时保证 >= tabsTop）
+				item._everActivated = index === 0;
 			});
 
 			this.category = category;
