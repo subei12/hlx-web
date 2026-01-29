@@ -70,11 +70,17 @@
     <div class="tabs-content">
 
       <gourd-tabs v-model="active" :distance="46" ref="tabs" @change="tabChange" @tab-content-move="tabContentMove" @tab-content-start="tabContentStart">
-        <gourd-tab v-for="(item,tagIndex) in tags" :key="item.ID" title="哈哈" :height="tabHeight">
+        <gourd-tab v-for="(item,tagIndex) in tags" :key="item.ID" title="哈哈">
           <span slot="title">{{item.name}}</span>
 
+          <!-- Single-scroll mode: outer .container handles scrolling; inner list must not scroll -->
           <gourd-pull-refresh v-model="item.refresh" disabled>
-            <gourd-list v-model="item.listLoading" ref="lists" :height="tabHeight" :disable-scroll="false" @load="listLoad(item,tagIndex)">
+            <gourd-list
+              v-model="item.listLoading"
+              :finished="item.finished"
+              :DisableScroll="true"
+              @load="listLoad(item,tagIndex)"
+            >
               <gourd-title v-for="postItem in item.posts" :key="postItem.postID" @click="titleClick(postItem)" :describe="postItem.detail" :title="postItem.title" :covers="postItem.detail | parseImg(postItem.images)" :author="postItem.user.nick" :see="postItem.hit" :info="postItem.commentCount" :time="postItem.createTime | formatTime">
                 <template slot="title-prefix">
                   <!-- 葫芦数 -->
@@ -157,7 +163,32 @@ export default {
 			}
 			this.timer = setTimeout(() => {
 				this.scrollTop = e.target.scrollTop;
+				// Single-scroll mode: trigger load-more based on outer container scroll
+				this.maybeLoadMore();
 			}, 15);
+		},
+		maybeLoadMore() {
+			const current = this.tags && this.tags[this.active];
+			if (!current) return;
+			if (current.listLoading || current.finished) return;
+
+			const el = this.el;
+			if (!el) return;
+
+			// Near bottom threshold
+			const threshold = 220;
+			if (el.scrollTop + el.clientHeight >= el.scrollHeight - threshold) {
+				current.listLoading = true;
+				this.$nextTick(() => {
+					this.listLoad(current, this.active);
+				});
+			}
+		},
+		loadFinishedCheck(item, posts) {
+			// Heuristic: if API returns fewer than requested, treat as finished
+			if (Array.isArray(posts) && posts.length < 20) {
+				item.finished = true;
+			}
 		},
 		async sortFun(sort,sortText) {
 			// sort_by(排序) 0 => 按回复时间 1 => 按发布时间 2 => 按版本精华
@@ -170,8 +201,10 @@ export default {
 			currentTag.sort_by = sort;
 			currentTag.start = 0;
 
-			this.$refs.lists[this.active].scroll(0, 0);
+			// single-scroll: outer container scrolls
+			this.el && this.el.scroll(0, 0);
 
+			currentTag.finished = false;
 			this.setItemData(currentTag, true);
 		},
 		blur() {
@@ -198,15 +231,16 @@ export default {
 
 				if (item.posts.length !== 0) {
 					item.refresh = true;
-					this.$refs.lists[this.active].scroll(0, 0);
+					// single-scroll: outer container scrolls; no inner list scroll restore
+					this.el && this.el.scroll(0, 0);
 				}
 
+				item.finished = false;
 				this.setItemData(item, true);
 			}
 
-			// var maxScrollY = this.el.scrollHeight - this.el.clientHeight;
-			// tweenAnimation(this.el, 'scrollY', this.el.scrollTop, maxScrollY, 200, 10, 'SineEaseOut');
-			this.el.scroll(0, this.el.scrollHeight - this.el.clientHeight);
+			// Keep previous behavior: when switching tabs, jump to bottom of header so list starts
+			this.el && this.el.scroll(0, this.el.scrollHeight - this.el.clientHeight);
 		},
 		titleClick(postItem) {
 			// console.log(postItem);
@@ -224,12 +258,15 @@ export default {
 
 			if (msg) {
 				console.log('获取数据失败');
+				item.listLoading = false;
+				item.refresh = false;
 				return;
 			}
 
 			item.listLoading = false;
 			item.refresh = false;
 			item.start = start;
+			this.loadFinishedCheck(item, posts);
 
 			if (restore) {
 				item.posts = posts;
@@ -238,6 +275,7 @@ export default {
 			}
 		},
 		async listLoad(item, index) {
+			// In single-scroll mode, listLoad can be triggered by outer container scroll.
 			this.setItemData(item);
 		},
 		async initData(params) {
@@ -271,6 +309,7 @@ export default {
 				item.listLoading = false;
 				item.refresh = false;
 				item.sort_by = this.post.sort_by;
+				item.finished = false;
 			});
 
 			this.category = category;
@@ -305,11 +344,6 @@ export default {
 		parseImg
 	},
 	computed: {
-		tabHeight() {
-			var sumHeight = this.el.offsetHeight;
-
-			return sumHeight - this.distance.tabsTop - this.distance.wrapHeight + this.distance.tabsTop;
-		},
 		moderator() {
 			const displayModerators = [];
 
@@ -407,6 +441,26 @@ export default {
 	position: relative;
 	padding: 10px 0 0;
 	background-color: #f0f0f0;
+}
+
+/* Single-scroll mode: make the tab bar sticky within the scroll container */
+/* NOTE: gourd-tabs has `overflow: hidden` by default, which breaks sticky.
+   We override it for this page so the tab bar can stick while the outer container scrolls. */
+/* Single-scroll mode: make the tab bar sticky within the scroll container */
+/*
+  Sticky 并不是因为“变成一个列表”就失效。
+  真正原因通常是：祖先元素有 overflow:hidden/auto 或 transform 导致 sticky 失效。
+  gourd-tabs 默认 overflow:hidden，所以这里强制覆盖。
+*/
+.container /deep/ .gourd-tabs {
+	overflow: visible !important;
+}
+
+.container /deep/ .gourd-tabs--wrap {
+	position: sticky !important;
+	top: 0 !important; /* .container 已经在 fixed nav 下面 */
+	z-index: 15 !important;
+	background: #fff;
 }
 
 #sort-btn {
